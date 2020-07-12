@@ -50,26 +50,31 @@ public class UserController {
 
 		RestUtil util = new RestUtil();
 
+		UserVO user = new UserVO();
 		JSONObject response = util.post("v2/user/me", kakao.getAccess_token());	// REST API 통한 USER 정보
+		logger.info(response.toString());
 		if(response != null) {
+			user.setKakaoId(String.valueOf(response.getInt("id")));
 			JSONObject accountObj = response.getJSONObject("kakao_account");
+			logger.info(accountObj.toString());
 			JSONObject profileObj = accountObj.getJSONObject("profile");
 			
 			if(accountObj.getBoolean("has_email")) {
-				UserVO user = new UserVO();
-				user.setEmail(accountObj.getString("email"));
+				if(accountObj.has("email")) {
+					user.setEmail(accountObj.getString("email"));
+				}
 				user.setNickname(profileObj.getString("nickname"));
 
 				UserVO selectUser = userService.selectOne(user);
 
-				if(selectUser != null) {
+				if(selectUser != null && selectUser.getId() > 0) {
 					result.put("user", new JSONObject(selectUser.toString()));
-					login(selectUser.getEmail(), "", request);
+					login(selectUser.getKakaoId(), "", request);
 				}else {
 					int insertResult = userService.insert(user);
 					result.put("user", new JSONObject(user.toString()));
 					if(insertResult > 0) {
-						login(user.getEmail(), "", request);
+						login(user.getKakaoId(), "", request);
 					}
 				}
 			}

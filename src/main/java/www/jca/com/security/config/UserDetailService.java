@@ -26,11 +26,11 @@ public class UserDetailService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserVO user = new UserVO();
-		user.setEmail(username);
+		user.setKakaoId(username);
 		user = dao.selectOne(user);
 		
 		GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole_name());
-		UserDetails userDetails = (UserDetails)new User(user.getEmail()
+		UserDetails userDetails = (UserDetails)new User(user.getKakaoId()
 				,""/*PASSWORD*/, Arrays.asList(authority));
 				
 		return userDetails;

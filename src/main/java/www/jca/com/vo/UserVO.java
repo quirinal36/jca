@@ -35,6 +35,7 @@ public class UserVO {
 	String thumbnail_image_url;
 	String profile_image_url;
 	String nickname;
+	String kakaoId;
 	
 	public static final int ROLE_ADMIN = 1;
 	public static final int ROLE_USER = 2;

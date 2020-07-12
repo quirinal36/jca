@@ -14,7 +14,7 @@
 		FROM users u LEFT JOIN roles r 
 			ON u.user_role = r.id
 		<where>
-			u.email = '${email}'
+			u.kakaoId = '${kakaoId}'
 		</where>
 	</select> 
 	
@@ -24,14 +24,16 @@
 			email,
 			thumbnail_image_url,
 			profile_image_url,
-			nickname
+			nickname,
+			kakaoId
 		)
 		VALUES
 		(
 			'${email}',
 			'${thumbnail_image_url}',
 			'${profile_image_url}',
-			'${nickname}'
+			'${nickname}',
+			'${kakaoId}'
 		)
 	</insert>
 </mapper>

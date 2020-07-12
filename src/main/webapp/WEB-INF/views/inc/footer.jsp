@@ -23,7 +23,9 @@ function logout(){
 	<div class="top">
 		<div>
 			<a href="/member/signup">사용자 등록</a>
-			<a href="/member/login">로그인</a>
+			<sec:authorize access="isAnonymous()">
+				<a href="/member/login">로그인</a>
+			</sec:authorize>
 			<sec:authorize access="isAuthenticated()">
 				<a href="javascript:logout();">로그아웃</a>
 			</sec:authorize>
