@@ -81,7 +81,14 @@
 					boardType = ${boardType}
 				</otherwise>
 			</choose>
-			
+			<if test="query != ''">
+			and 
+				(
+				title like '%${query}%'
+				or
+				content like '%${query}%'
+				)
+			</if>
 		</where>
 	</select>
 	
