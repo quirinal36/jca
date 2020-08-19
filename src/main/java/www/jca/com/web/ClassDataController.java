@@ -43,8 +43,7 @@ public class ClassDataController implements BoardController<Board> {
 	@RequestMapping(value= "/class/data/list")
 	@Override
 	public ModelAndView getListView(ModelAndView mv, Board model) {
-		List<Board> boardList = new ArrayList<Board>();
-		
+		List<Board> boardList = new ArrayList<Board>();		
 		RestTemplate rest = new RestTemplate();
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append("http://jcoding.kr/api/board/list/").append(model.getBoardType());
@@ -76,10 +75,6 @@ public class ClassDataController implements BoardController<Board> {
 		}
 		//Board paging = rest.getForObject(urlBuilder2.toString(), Board.class);
 		ResponseEntity<Board> resp = rest.getForEntity(urlBuilder2.toString(), Board.class);
-		logger.info("status code : "+resp.getStatusCode());
-		logger.info("body : "+resp.getBody().toString());
-		mv.addObject("paging", resp.getBody());
-		
 		mv.setViewName("/notice/dataList");
 		return mv;
 	}
@@ -133,7 +128,6 @@ public class ClassDataController implements BoardController<Board> {
 		urlBuilder.append("http://jcoding.kr/api/board/edit/");
 		
 		JSONObject json = new JSONObject(rest.postForObject(urlBuilder.toString(), model, Board.class));
-		logger.info(json.toString());
 		return json.toString();
 	}
 	

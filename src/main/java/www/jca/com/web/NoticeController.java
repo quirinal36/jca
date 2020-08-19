@@ -105,15 +105,19 @@ public class NoticeController extends JCAController implements BoardController<B
 	@Override
 	@RequestMapping(value="/edit", method = RequestMethod.GET)
 	public ModelAndView getEditView(ModelAndView mv, Board model, HttpServletRequest request) {
-		Board board = service.selectOne(model);
-		
-		List<Menus> menus = menuService.selectChildren();
-		Menus menu = menuService.selectOne(Menus.newInstance(board.getBoardType()));
-		
-		mv.addObject("boardTypes", menus);
-		mv.addObject("menu", menu);
-		mv.addObject("board", board);
-		mv.setViewName("/notice/edit");
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			Board board = service.selectOne(model);
+			
+			List<Menus> menus = menuService.selectChildren();
+			Menus menu = menuService.selectOne(Menus.newInstance(board.getBoardType()));
+			
+			mv.addObject("boardTypes", menus);
+			mv.addObject("menu", menu);
+			mv.addObject("board", board);
+			mv.setViewName("/notice/edit");
+		}else {
+			mv.setViewName("redirect:/");
+		}
 		return mv;
 	}
 	
@@ -186,9 +190,7 @@ public class NoticeController extends JCAController implements BoardController<B
 	}
 	
 	@Override
-	@RequestMapping(value="/edit", method=RequestMethod.POST)
 	public ModelAndView edit(Board model, ModelAndView mv) {
-		logger.info(model.toString());
 		
 		JSONObject json = new JSONObject();
 		int result = service.update(model);
@@ -197,7 +199,18 @@ public class NoticeController extends JCAController implements BoardController<B
 		mv.setViewName("redirect:/board/type/"+model.getBoardType());
 		return mv;
 	}
-
+	@RequestMapping(value="/edit", method=RequestMethod.POST)
+	public ModelAndView edit(Board model, ModelAndView mv, HttpServletRequest request) {
+		JSONObject json = new JSONObject();
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			int result = service.update(model);
+			json.put("result", result);
+			mv.setViewName("redirect:/board/type/"+model.getBoardType());
+		}else {
+			json.put("result", -1);
+		}
+		return mv;
+	}
 	@Override
 	@ResponseBody
 	@RequestMapping(value="/delete", method=RequestMethod.POST)

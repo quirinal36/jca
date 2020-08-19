@@ -9,9 +9,9 @@
 <head>
 	<c:import url="/inc/head"></c:import>
 	<script type="text/javascript">
-	function pageGo(pageNum){
-		$("input[name='pageNo']").val(pageNum);
-		$("form").submit();
+	function pageGo(boardType, pageNo){
+		$("#search-form input[name='pageNo']").val(pageNo);
+		$("#search-form").submit();
 	}
 	</script>
 </head>
@@ -26,53 +26,53 @@
 				</div>
 			</div>
 			<div class="board_list_wrap">
-				<form action="<c:url value="${listUrl }"/>">
+				<form id="search-form" action="<c:url value="${listUrl }"/>"> 
 					<input type="hidden" name="pageNo" value="${paging.pageNo }"/>
+					<input type="hidden" name="boardType" value="${paging.boardType }"/>
+					<input type="text" name="query" value="${paging.query }"/>
+					<input type="submit" value="검색" />
 				</form>
 				<div class="board_list_type2">
-					<c:forEach items="${list }" var="item">
-					<div class="item">
-						<div class="image">
-							<a href="<c:url value="/board/notice/view?id=${item.id }"/>">
-								<c:choose>
-									<c:when test="${not empty item.thumbnail }">
-										<img src="<c:url value="${item.thumbnail }" />"/>
-									</c:when>
-									<c:otherwise>
-										<img src="<c:url value="/resources/img/temp/1.jpeg"/>" alt="사진">
-									</c:otherwise>
-								</c:choose>
-								
-							</a>
-						</div>
-						<div class="cont">
-							<div class="category">${item.boardName }</div>
-							<div class="title"><a href="<c:url value="/board/view?id=${item.id }"/>">${item.title }</a></div>
-							<div class="etc">
-								<span>${item.writerName }</span>
-								<span><fmt:formatDate value="${item.wdate}" pattern="yyyy-MM-dd" /></span>
+					<c:forEach items="${list }" var="board">
+						<!-- 예시글 1번 -->
+						<div class="item">
+							<div class="image">
+								<a href="<c:url value="/board/notice/view?id=0"/>">
+									<img src="<c:url value="/resources/img/temp/1.jpeg"/>" alt="사진">
+								</a>
+							</div>
+							<div class="cont">
+								<div class="category">${board.boardName }</div>
+								<div class="title"><a href="<c:url value="/board/view?id=${board.id }"/>">${board.title }</a></div>
+								<div class="etc">
+									<span>${board.writerName }</span>
+								</div>
+								<div class="date">
+									<span><fmt:formatDate value="${board.wdate}" pattern="yyyy-MM-dd" /></span>
+								</div>
 							</div>
 						</div>
-					</div>
 					</c:forEach>
 				</div>
 				<div class="page_wrap">
-					<a href="javascript:pageGo(${paging.firstPageNo})" class="bt first">맨 처음 페이지로 가기</a>
-						<a href="javascript:pageGo(${paging.prevPageNo})" class="bt prev">이전 페이지로 가기</a>
+					<a href="javascript:pageGo('${paging.boardType }','${paging.firstPageNo}')" class="bt first">맨 처음 페이지로 가기</a>
+					<a href="javascript:pageGo('${paging.boardType }','${paging.prevPageNo}')" class="bt prev">이전 페이지로 가기</a>
+					<c:forEach begin="${paging.startPageNo }" end="${paging.endPageNo}" step="1" varStatus="status">
 						<c:choose>
-							<c:when test="${paging.finalPageNo eq 0}">
-								<a href="javascript:pageGo(1)" class="num on">1</a>
+							<c:when test="${status.current == paging.pageNo }">
+								<a href="javascript:pageGo('${paging.boardType }','${status.current }')" class="num on">
+								${status.current}
+								</a>						
 							</c:when>
 							<c:otherwise>
-								<c:forEach begin="${paging.startPageNo }" end="${paging.endPageNo}" varStatus="loop">
-									<a href="javascript:pageGo(${loop.current })" class="num <c:if test="${loop.current eq paging.pageNo }">on</c:if>">
-									${loop.current }
-									</a>
-								</c:forEach>
+								<a href="javascript:pageGo('${paging.boardType }','${status.current }')" class="num">
+								${status.current}
+								</a>
 							</c:otherwise>
 						</c:choose>
-						<a href="javascript:pageGo(${paging.nextPageNo})" class="bt next">다음 페이지로 가기</a>
-						<a href="javascript:pageGo(${paging.endPageNo})" class="bt last">마지막 페이지로 가기</a>
+					</c:forEach>
+						<a href="javascript:pageGo('${paging.boardType }','${paging.nextPageNo}')" class="bt next">다음 페이지로 가기</a>
+						<a href="javascript:pageGo('${paging.boardType }','${paging.finalPageNo}')" class="bt last">마지막 페이지로 가기</a>
 					</div>
 				<div class="bt_wrap">
 					<a href="#" class="bt1 on">목록</a>

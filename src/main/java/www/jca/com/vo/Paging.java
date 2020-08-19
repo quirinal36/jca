@@ -213,9 +213,4 @@ public class Paging {
 
         this.setFinalPageNo(finalPage); // 마지막 페이지 번호
     }
-    
-    @Override
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
 }

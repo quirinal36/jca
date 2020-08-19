@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,12 +24,22 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -46,6 +57,8 @@ public class FileController extends JCAController{
 	protected PhotoInfoService photoInfoService;
 	@Autowired
 	protected FileInfoService fileInfoService;
+	@Autowired
+	ServletContext context;
 	
 	@ResponseBody
 	@RequestMapping(value="/upload/file", method = {RequestMethod.GET, RequestMethod.POST})
@@ -92,6 +105,54 @@ public class FileController extends JCAController{
         }
         
         return map;
+	}
+	
+
+	@ResponseBody 
+	@RequestMapping(value = "/upload/image/rest", method = {RequestMethod.POST})
+    public Map uploadImage2(MultipartHttpServletRequest request, 
+    		HttpServletResponse response) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Iterator<String> itr = request.getFileNames();
+        MultipartFile mpf;
+        if (itr.hasNext()) {
+            mpf = request.getFile(itr.next());
+            String newFilenameBase = UUID.randomUUID().toString();
+            String originalFileExtension = mpf.getOriginalFilename().substring(mpf.getOriginalFilename().lastIndexOf("."));
+            String newFilename = newFilenameBase + originalFileExtension;
+            
+            String srcPath = new FileUtil().makeUserPath();
+//			String contentType = mpf.getContentType();
+			
+			File newFile = new File(srcPath + File.separator + newFilename);
+			
+            try {
+				mpf.transferTo(newFile);
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            
+           
+    		String url = "http://localhost:8080/api/board/upload";
+    		
+    		HttpHeaders headers = new HttpHeaders();
+    		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+    		logger.info(newFile.getAbsolutePath());
+			logger.info("file size : "+newFile.length());
+			
+    		MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
+    		body.add("file", newFile);
+    		
+    		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+    		RestTemplate rest = new RestTemplate();
+    		ResponseEntity<String> respEnt = rest.postForEntity(url, requestEntity, String.class);
+    		logger.info("body : "+respEnt.getBody());
+        }
+		
+		return map;
 	}
 	
 	@ResponseBody 

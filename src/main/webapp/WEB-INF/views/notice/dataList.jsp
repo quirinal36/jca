@@ -7,6 +7,7 @@
 	<c:import url="/inc/head"></c:import>
 	<script type="text/javascript">
 	function pageGo(boardType, pageNo){
+		$("#search-form input[name='pageNo']").val(pageNo);
 		$("#search-form").submit();
 	}
 	</script>
@@ -22,10 +23,10 @@
 				</div>
 			</div>
 			<div class="board_list_wrap">
-				<form id="search-form" action="<c:url value="${listUrl }"/>">
+				<form id="search-form" action="<c:url value="${listUrl }"/>"> 
 					<input type="hidden" name="pageNo" value="${paging.pageNo }"/>
-					<input type="text" name="query" value="${paging.query }"/>
 					<input type="hidden" name="boardType" value="${paging.boardType }"/>
+					<input type="text" name="query" value="${paging.query }"/>
 					<input type="submit" value="검색" />
 				</form>
 				<div class="board_list_type2">
